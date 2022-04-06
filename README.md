@@ -481,7 +481,9 @@ Mes containers sont bien en **up**
 
 Je vais aller sur le navigateur voir si j'ai bien mon **Registry private**
 ```
-
+http://192.168.56.30:4002
 ```
+
+### images du registry private
 
 
