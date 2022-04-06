@@ -384,3 +384,104 @@ bc83b306b3c2   student-list_api_network_pozos   bridge    local
 ### images de test phase IAC à mettre
 
 **Fin de la phase de IAC, succès**
+
+## Partie 3: Docker Registry
+
+L'objectif de cette partie est de déployer un régistre privé afin d'enterriner notre image dans ce registre.
+
+Pour ce faire, nous avons les indications dans l'énoncé du dépôt git du projet. Cliquer sur ce lien [registry](https://docs.docker.com/registry/) pour avoir la procédure à suivre.
+Le lien suivant [interface](https://hub.docker.com/r/joxit/docker-registry-ui/) nous mène vers une image qui nous servira d'IHM pour notre **Registry**
+
+Commençons par déployer le **Registry**
+- Mon **Registry** doit être déployé dans le même réseau **student-list_api_network_pozos**
+- Je demarrer mon registry
+```
+[vagrant@docker student-list]$ docker run -d -p 5000:5000 --name registry-pozos --network student-list_api_network_pozos registry:2
+```
+- Je vérifie que mon container **registry-pozos** est bien en place
+```
+[vagrant@docker student-list]$ docker ps -a
+```
+```
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+34d61a9bec77   registry:2     "/entrypoint.sh /etc…"   21 seconds ago   Up 18 seconds   0.0.0.0:5000->5000/tcp, :::5000->5000/tcp   registry-pozos
+29b92de874b2   api-pozos:V1   "python ./student_ag…"   35 minutes ago   Up 35 minutes   0.0.0.0:4000->5000/tcp, :::4000->5000/tcp   student-list-api-pozos1-1
+71b89d470909   php:apache     "docker-php-entrypoi…"   35 minutes ago   Up 35 minutes   0.0.0.0:8082->80/tcp, :::8082->80/tcp       student-list-web-pozos1-1
+```
+- Je vais renommer mon image pour qu'elle puisse aller taper le registry
+```
+[vagrant@docker student-list]$ docker images
+```
+```
+REPOSITORY   TAG           IMAGE ID       CREATED         SIZE  
+api-pozos    V1            ddd9133d5014   2 hours ago     1.13GB
+registry     2             2e200967d166   36 hours ago    24.2MB
+php          apache        c3d1b09e989b   8 days ago      458MB 
+python       2.7-stretch   e71fc5c0fcb1   23 months ago   928MB 
+```
+Pour renommer mon image:
+```
+[vagrant@docker student-list]$ docker image tag api-pozos:V1 localhost:5000/api-pozos:V1
+```
+```
+[vagrant@docker student-list]$ docker images
+REPOSITORY                 TAG           IMAGE ID       CREATED         SIZE  
+api-pozos                  V1            ddd9133d5014   2 hours ago     1.13GB
+localhost:5000/api-pozos   V1            ddd9133d5014   2 hours ago     1.13GB
+registry                   2             2e200967d166   36 hours ago    24.2MB
+php                        apache        c3d1b09e989b   8 days ago      458MB 
+python                     2.7-stretch   e71fc5c0fcb1   23 months ago   928MB
+```
+Voici donc le nouveau tag qui a le même id que l'image et le même size
+```
+localhost:5000/api-pozos   V1            ddd9133d5014   2 hours ago     1.13GB
+```
+C'est donc ce nouveau tag que je vais envoyer dans le **Registry** ci-dessous
+```
+registry                   2             2e200967d166   36 hours ago    24.2MB
+```
+
+Pour envoyer ce tag dans le container **Registry**, je vais le pusher
+```
+[vagrant@docker student-list]$ docker push localhost:5000/api-pozos:V1
+```
+Push effectué avec succès
+```
+The push refers to repository [localhost:5000/api-pozos]
+b070f68f94e7: Pushed 
+d0ce8915fc21: Pushed
+0f1333464ea4: Pushed
+811b6c5694d4: Pushed
+1855932b077c: Pushed
+fa28e7fcadc2: Pushed
+4427a3d9a321: Pushed
+4a03ae8d3bee: Pushed
+a9286fedbd63: Pushed
+d50e7be1e737: Pushed
+6b114a2dd6de: Pushed
+bb9315db9240: Pushed
+V1: digest: sha256:bd06cbe98d9c2a1c7130195c578fe72f5926765c48eef4cbbd45cbbe1bf4c062 size: 2854
+```
+
+Pour lancer l'image **Registry**
+```
+[vagrant@docker student-list]$ docker run -d --name registry-pozos_UI --network student-list_api_network_pozos -p 4002:80 -e REGISTRY_TITLE="POZOS REGISTRY" -e REGISTRY_URL=http://registry-pozos:5000 -e DELETE_IMAGES=true joxit/docker-registry-ui:static
+```
+
+Je vérifie que mon container est présent
+```
+[vagrant@docker student-list]$ docker ps -a
+CONTAINER ID   IMAGE                             COMMAND                  CREATED             STATUS             PORTS                                       NAMES
+4fe42de81233   joxit/docker-registry-ui:static   "/docker-entrypoint.…"   36 seconds ago      Up 34 seconds      0.0.0.0:4002->80/tcp, :::4002->80/tcp       registry-pozos_UI
+34d61a9bec77   registry:2                        "/entrypoint.sh /etc…"   38 minutes ago      Up 38 minutes      0.0.0.0:5000->5000/tcp, :::5000->5000/tcp   registry-pozos   
+29b92de874b2   api-pozos:V1                      "python ./student_ag…"   About an hour ago   Up About an hour   0.0.0.0:4000->5000/tcp, :::4000->5000/tcp   student-list-api-pozos1-1
+71b89d470909   php:apache                        "docker-php-entrypoi…"   About an hour ago   Up About an hour   0.0.0.0:8082->80/tcp, :::8082->80/tcp       student-list-web-pozos1-1
+```
+Mes containers sont bien en **up**
+
+Je vais aller sur le navigateur voir si j'ai bien mon **Registry private**
+```
+
+```
+
+
