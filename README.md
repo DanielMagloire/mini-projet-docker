@@ -3,8 +3,7 @@ Déploiement d'un micro-service flask python
 
 **Objectif du projet :** Valider les acquis sur le module **Docker**.
 
-Dans ce mini-projet-docker, il est question pour nous d'embarquer une application dans un container docker. Cette application se trouve dans repository git du lien suivant.
-`https://github.com/diranetafen/student-list`
+Dans ce mini-projet-docker, il est question pour nous d'embarquer une application dans un container docker. Cette application se trouve dans repository git du lien suivant [dirane](https://github.com/diranetafen/student-list)
 
 # Résolution explicative du projet
 
