@@ -271,7 +271,7 @@ services:
         networks:
             - api_network_pozos
     api-pozos1:
-        image: api-pozos:V1
+        image: daniel-pozos:V1
         ports:
             - "4000:5000"
         volumes:
@@ -482,6 +482,7 @@ Je vais aller sur le navigateur voir si j'ai bien mon **Registry private**
 ```
 http://192.168.56.30:4002
 ```
+
 
 ### images du registry private
 
